@@ -1,0 +1,33 @@
+name: Update EPG Daily
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Update EPG
+      run: python update_epg.py
+
+    - name: Commit and push
+      run: |
+        git config --global user.email "bot@github.com"
+        git config --global user.name "EPG Bot"
+        git add .
+        git commit -m "Automatic EPG update" || echo "No changes"
+        git push
